@@ -1,6 +1,6 @@
 # 🧪 Soft Assertion Fuzzer
 
-Automatically detect numerical instability in ML applications using learnable soft assertions.
+Soft Assertion Fuzzer is an automated tool that leverages pre-trained ML models (Soft Assertions) to trigger and detect numerical instability in PyTorch-based ML applications. It intelligently mutates inputs to uncover conditions leading to NaNs, Infs, or incorrect outputs — beyond just crashes.
 
 **Soft Assertion Fuzzer** implements the technique from our [FSE 2025 paper](https://arxiv.org/pdf/2504.15507)  
 **"Automatically Detecting Numerical Instability in Machine Learning Applications via Soft Assertions"**.
@@ -25,6 +25,15 @@ Sharmin, Zahid, Bhattacharjee, Igwilo, Kim, Le
 **“Automatically Detecting Numerical Instability in Machine Learning Applications via Soft Assertions”**,  
 *FSE 2025, ACM*  
 https://arxiv.org/pdf/2504.15507
+
+
+### Key Features
+- 🚨 Detects hidden numerical bugs using learned boundary models
+- 🤖 Supports over 20+ PyTorch operations (exp, relu, log, softmax, matmul, etc.)
+- 📊 Logs failure-inducing inputs and timings in `experiments/logs/`
+- 🧠 Leverages gradient-based mutation + pretrained soft assertion models
+- ✅ Works on arbitrary scripts with `start_fuzz()` and `end_fuzz()` hooks
+- ⚙️ Configurable via `config/default.yaml`
 
 ---
 
