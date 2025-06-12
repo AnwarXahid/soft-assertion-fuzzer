@@ -1,15 +1,10 @@
 # 🧪 Soft Assertion Fuzzer
 
-Soft Assertion Fuzzer is an automated tool that leverages pre-trained ML models (Soft Assertions) to trigger and detect numerical instability in PyTorch-based ML applications. It intelligently mutates inputs to uncover conditions leading to NaNs, Infs, or incorrect outputs — beyond just crashes.
-
-**Soft Assertion Fuzzer** implements the technique from our [FSE 2025 paper](https://arxiv.org/pdf/2504.15507)  
-**"Automatically Detecting Numerical Instability in Machine Learning Applications via Soft Assertions"**.
+Soft Assertion Fuzzer is an automated tool that leverages pre-trained ML models (Soft Assertions) to trigger and detect numerical instability in ML-based applications. It intelligently mutates inputs to uncover conditions leading to NaNs, Infs, or incorrect outputs — beyond just simple crashes. We implemented the technique from our [FSE 2025 paper](https://arxiv.org/pdf/2504.15507): **"Automatically Detecting Numerical Instability in Machine Learning Applications via Soft Assertions"**.
 
 ---
 
-Machine learning (ML) applications rely heavily on floating-point arithmetic. They often operate on extremely large or small values, making them vulnerable to **numerical instability** — silent bugs that can cause incorrect outputs, wasted resources, or even model failures.
-
-We introduce a novel technique called **Soft Assertions**, which are **learned numerical safety models** trained during unit testing of unstable functions (e.g., `exp`, `log`, `softmax`). Each soft assertion predicts how to **mutate inputs to trigger instability**.
+Machine learning (ML) applications rely heavily on floating-point arithmetic. They often operate on extremely large or small values, making them vulnerable to **numerical instability** — silent bugs that can cause incorrect outputs, wasted resources, or even model failures. We introduce a novel technique called **Soft Assertions**, which are **learned numerical safety models** trained during unit testing of unstable functions (e.g., `exp`, `log`, `softmax`). Each soft assertion predicts how to **mutate inputs to trigger instability**.
 
 Given an ML script:
 - Our tool scans for known unstable functions
@@ -25,15 +20,6 @@ Sharmin, Zahid, Bhattacharjee, Igwilo, Kim, Le
 **“Automatically Detecting Numerical Instability in Machine Learning Applications via Soft Assertions”**,  
 *FSE 2025, ACM*  
 https://arxiv.org/pdf/2504.15507
-
-
-### Key Features
-- 🚨 Detects hidden numerical bugs using learned boundary models
-- 🤖 Supports over 20+ PyTorch operations (exp, relu, log, softmax, matmul, etc.)
-- 📊 Logs failure-inducing inputs and timings in `experiments/logs/`
-- 🧠 Leverages gradient-based mutation + pretrained soft assertion models
-- ✅ Works on arbitrary scripts with `start_fuzz()` and `end_fuzz()` hooks
-- ⚙️ Configurable via `config/default.yaml`
 
 ---
 
@@ -102,11 +88,12 @@ PYTHONPATH=. pytest tests/
 
 ## 📦 Current Features
 
-- ✅ PyTorch support: `exp`, `relu`, `log`, `softmax`, `sqrt`, `matmul`, etc.
-- ✅ Fuzzing based on symbolic gradients
-- ✅ NaN-guarding oracles for safety assertion
-- ✅ AST-based region identification using `start_fuzz()` / `end_fuzz()`
-- ✅ Logging of input triggers and fuzzing duration
+- 🚨 Detects hidden numerical bugs using learned boundary models
+- 🤖 Supports over 20+ PyTorch operations (exp, relu, log, softmax, matmul, etc.)
+- 📊 Logs failure-inducing inputs and timings in `experiments/logs/`
+- 🧠 Leverages gradient-based mutation + pretrained soft assertion models
+- ✅ Works on arbitrary scripts with `start_fuzz()` and `end_fuzz()` hooks
+- ⚙️ Configurable via `config/default.yaml`
 
 ---
 
