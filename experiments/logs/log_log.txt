@@ -1,0 +1,7 @@
+[BUG FOUND] Function: log
+Timestamp: 2025-06-11 19:10:01.474182
+Input:
+(tensor([[90.6689, 40.7528, 76.8012],
+        [43.8680, -2.1075, 34.9325],
+        [29.0669, 29.5666, 47.2871]], requires_grad=True),)
+Elapsed Time: 0.000 seconds

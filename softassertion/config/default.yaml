@@ -1,0 +1,7 @@
+tensor_size: [3, 3]
+min_value: -10
+max_value: 100
+stop_on_failure: true
+model_type: 14_by_14
+oscillation_threshold: 10
+
