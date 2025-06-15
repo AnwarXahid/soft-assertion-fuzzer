@@ -192,4 +192,4 @@ settings.local.py
 .secrets
 
 # experiments
-experiments
+experiments/

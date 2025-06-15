@@ -1,4 +1,3 @@
-import yaml
 import torch
 import time
 import sys
@@ -6,19 +5,19 @@ import itertools
 import os
 import json
 from datetime import datetime
+from colorama import Fore, Style, init as colorama_init
 
 from softassertion.fuzzing.history import OscillationTracker
 from softassertion.utils.config import load_default_config
 from softassertion.engine.input_selector import get_input_generator
 from softassertion.engine.oracle_selector import get_oracle_for_function
-from softassertion.utils.unstable_func_enum import UnstableFuncEnum
 from change_direction import (
     get_change_direction,
     get_change_direction_for_binary_operand,
 )
 
 spinner = itertools.cycle(["|", "/", "-", "\\"])
-
+colorama_init(autoreset=True)
 
 def run_fuzzing_on_calls(call_names):
     config = load_default_config()
@@ -41,7 +40,7 @@ def run_fuzzing_on_calls(call_names):
 
 
 def run_fuzz_for_one_call(call, config, trace_entries, summary):
-    print(f"[FuzzRunner] Running soft assertion fuzzing for: {call}")
+    print(f"{Fore.YELLOW}[FuzzRunner] Running soft assertion fuzzing for: {call}{Style.RESET_ALL}")
     generator = get_input_generator(call)
     oracle = get_oracle_for_function(call)
 
@@ -71,7 +70,7 @@ def run_fuzz_for_one_call(call, config, trace_entries, summary):
             sys.stdout.flush()
 
             if elapsed > time_budget:
-                print(f"\n[FuzzRunner] ⏱️ Timeout: {call} exceeded {time_budget} seconds")
+                print(f"{Fore.CYAN}\n[FuzzRunner] ⏱️ Timeout: {call} exceeded {time_budget} seconds{Style.RESET_ALL}")
                 break
 
             if call in torch.nn.functional.__dict__:
@@ -89,7 +88,7 @@ def run_fuzz_for_one_call(call, config, trace_entries, summary):
                 break
 
             if not oracle(output):
-                print(f"\n[FuzzRunner] ❌ Bug triggered by input:\n{inputs}")
+                print(f"{Fore.RED}\n[FuzzRunner] ❌ Bug triggered by input:\n{inputs}{Style.RESET_ALL}")
                 os.makedirs("experiments/logs", exist_ok=True)
                 log_path = f"experiments/logs/log_{call}.txt"
                 with open(log_path, "w") as log:
@@ -145,7 +144,7 @@ def run_fuzz_for_one_call(call, config, trace_entries, summary):
             for tensor in inputs:
                 tensor.requires_grad_(True)
 
-        print(f"\n[FuzzRunner] ✅ Done: No failure found for: {call}")
+        print(f"{Fore.GREEN}\n[FuzzRunner] ✅ Done: No failure found for: {call}{Style.RESET_ALL}")
         os.makedirs("experiments/logs", exist_ok=True)
         with open(f"experiments/logs/log_{call}.txt", "w") as log:
             log.write(f"[NO BUG] Function: {call}\n")
@@ -162,7 +161,7 @@ def run_fuzz_for_one_call(call, config, trace_entries, summary):
         })
 
     except Exception as e:
-        print(f"\n[FuzzRunner] Error during fuzzing {call}: {e}")
+        print(f"{Fore.MAGENTA}\n[FuzzRunner] Error during fuzzing {call}: {e}{Style.RESET_ALL}")
 
 
 def save_summary_and_trace(summary, trace_entries):

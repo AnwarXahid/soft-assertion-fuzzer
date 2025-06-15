@@ -175,15 +175,24 @@ Let’s walk through using Soft Assertion Fuzzer on a real example.
 
 ### 🧪 Step 1: Start with a simple ML script
 
-Suppose you have a script named `test_saf.py`:
+Suppose you have a script named `test_fuzzer.py`:
 
 ```python
-# test_saf.py
+# test_fuzzer.py
 import torch
 
-x = torch.rand((3, 3)) - 0.5  # Some values < 0
-y = torch.log(x)              # May trigger NaN due to negative input
-print("Log output:\n", y)
+def test():
+    
+    x = torch.rand((3, 3))
+    y = torch.nn.functional.softmax(x, dim=1)
+    print("Softmax output:\n", y)
+
+    z = torch.rand((3, 3)) - 0.5  
+    w = torch.log(z)
+    print("Log output:\n", w)
+
+if __name__ == '__main__':
+    test()
 ```
 
 This script **runs** — but silently generates `nan` values. No error is thrown.  
@@ -193,20 +202,28 @@ This is where **numerical instability** hides.
 
 ### ⚙️ Step 2: Instrument the script for fuzzing
 
-Now, modify `test_saf.py` by adding Soft Assertion Fuzzer hooks:
+Now, modify `test_fuzzer.py` by adding Soft Assertion Fuzzer hooks:
 
 ```python
-# test_saf.py (instrumented)
+# test_fuzzer.py (instrumented)
 import torch
-from softassertion.analysis.boundary_tracer import start_fuzz, end_fuzz
+from softassertion.analysis.boundary_tracer import start_fuzz, end_fuzz         # import hooks
 
-start_fuzz()  # Start fuzzing scope
+def test():
+    start_fuzz()               # Start fuzzing scope
 
-x = torch.rand((3, 3)) - 0.5
-y = torch.log(x)
-print("Log output:\n", y)
+    x = torch.rand((3, 3))
+    y = torch.nn.functional.softmax(x, dim=1)
+    print("Softmax output:\n", y)
 
-end_fuzz()    # End fuzzing scope
+    z = torch.rand((3, 3)) - 0.5  
+    w = torch.log(z)
+    print("Log output:\n", w)
+
+    end_fuzz()                  # End fuzzing scope
+
+if __name__ == '__main__':
+    test()
 ```
 
 > 🧠 `start_fuzz()` and `end_fuzz()` mark the **region of interest**. 
@@ -219,7 +236,7 @@ end_fuzz()    # End fuzzing scope
 Run Soft Assertion Fuzzer on your script:
 
 ```bash
-softassertion-cli test_saf.py
+softassertion-cli test_fuzzer.py
 ```
 
 Behind the scenes:
@@ -232,9 +249,9 @@ Behind the scenes:
 
 ---
 
-### 📁 Step 4: View results
+### 📁 Step 4: View Results <!-- 🔽 UPDATED SECTION START -->
 
-All logs and reports are saved under:
+All logs and reports are stored under:
 
 ```bash
 experiments/logs/
@@ -242,22 +259,55 @@ experiments/logs/
 
 You’ll find:
 
-- `inputs_failed.npy` — inputs that triggered instability
-- `summary_report.json` — what failed, why, how
-- `trace.log` — fuzzer execution trace
+| File                          | Description                                 |
+|-------------------------------|---------------------------------------------|
+| `log_<function>.txt`          | Failure or timeout log for each function    |
+| `summary_report.json`         | JSON summary of all results                 |
+| `trace.log`                   | Execution timeline (step-by-step trace)     |
+| `inputs_failed.npy` (optional)| Serialized failure-triggering inputs        |
+
+> 🧪 Example file: `experiments/logs/log_log.txt`
+
 ---
 
+### 📝 Step 5: Sample Failure Output
 
-### 🔍 Sample Failure Report
+Here’s what a **real bug discovery** might look like:
 
+#### 📦 Console Output
+```bash
+[FuzzRunner] ❌ Bug triggered by input:
+(tensor([[62.8839, 63.8055, 69.9051],
+        [16.3082, 69.6523, -8.1343],
+        [52.0661, 17.2648, 30.0087]], requires_grad=True),)
+[FuzzRunner] ✅ Done: No failure found for: softmax
+
+📊 Case Study Summary:
+  Total Cases: 2
+  Passed: 1
+  Failed: 1
+  Average Time (sec): 5.0
+  Failure Rate: 50.0
+```
+
+#### 📄 Summary JSON (`summary_report.json`)
 ```json
-{
-  "function": "torch.log",
-  "input": [[-0.002, -0.531]],
-  "oracle": "NaN/INF",
-  "model_signal": "no_change",
-  "severity": "high"
-}
+[
+  {
+    "function": "torch.log",
+    "status": "FAIL",
+    "oracle": "NaN/INF",
+    "input": [[62.8839, 63.8055, 69.9051], [16.3082, 69.6523, -8.1343], [52.0661, 17.2648, 30.0087]],
+    "model_signal": "no_change",
+    "severity": "high",
+    "elapsed_time": 5.0
+  },
+  {
+    "function": "torch.softmax",
+    "status": "PASS",
+    "elapsed_time": 10.0
+  }
+]
 ```
 
 ---
