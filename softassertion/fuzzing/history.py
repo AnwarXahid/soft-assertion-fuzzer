@@ -1,3 +1,5 @@
+import torch
+
 class OscillationTracker:
     def __init__(self, threshold: int = 3):
         self.history = []

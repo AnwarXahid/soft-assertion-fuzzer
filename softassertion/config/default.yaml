@@ -1,7 +1,22 @@
+# ==== Input Generation Parameters ====
 tensor_size: [3, 3]
 min_value: -10
 max_value: 100
-stop_on_failure: true
-model_type: 14_by_14
-oscillation_threshold: 10
 
+# ==== Fuzzing Control ====
+stop_on_failure: true
+oscillation_threshold: 10
+model_type: 14_by_14
+timeout: 10
+enable_parallel: true
+
+# ==== Fuzzing Runtime Config ====
+max_fuzz_iterations: 100
+mutation_rate: 0.1
+gradient_backprop: true
+
+# ==== Logging Options ====
+logging:
+  save_inputs: true
+  format: json
+  output_dir: experiments/logs/
