@@ -1,3 +1,0 @@
-[NO BUG] Function: softmax
-Timestamp: 2025-06-15 16:58:14.382842
-Elapsed Time: 10.000 seconds
