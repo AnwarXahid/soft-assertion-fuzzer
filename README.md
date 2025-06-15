@@ -1,9 +1,8 @@
 # 🔍🐞 Soft Assertion Fuzzer
 
-> **A next-generation fuzzing framework to expose the hidden dangers of numerical instability in ML applications.**
->  
-> Automatically guided by *learned soft assertions*, this fuzzer finds the silent killers: NaNs, Infs, and **wrong-but-looks-fine predictions** in your ML models.  
-> If it's unstable — we *will* break it. Intelligently.
+> - **A smarter way to find numerical bugs in ML code.**
+> - Powered by learned *soft assertions*, this fuzzer doesn’t just catch crashes — it uncovers hidden instabilities like NaNs, Infs, and silent mispredictions that break model reliability.
+> - If your ML code is numerically unstable — **we will detect it. Automatically. Precisely. At scale.**
 
 ---
 

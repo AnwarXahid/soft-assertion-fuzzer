@@ -183,7 +183,7 @@ def save_summary_and_trace(summary, trace_entries):
     fail_rate = failed / total if total > 0 else 0.0
 
     summary_stats = {
-        "Total Cases": total,
+        "Total Functions": total,
         "Passed": passed,
         "Failed": failed,
         "Average Time (sec)": round(avg_time, 3),
