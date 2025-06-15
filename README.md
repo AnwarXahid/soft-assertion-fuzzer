@@ -31,65 +31,63 @@
 
 ---
 
-## 📚 What is This?
+## 📚 What Is This?
 
-**Soft Assertion Fuzzer** is not your average testing tool. It fuses the power of **pretrained machine learning assertions** with the flexibility of **dynamic fuzzing**, enabling it to uncover deep numerical failures that plague ML applications — from instability in `exp()` & `log()` to subtle bugs in `matmul`& `relu`, etc.
+**Soft Assertion Fuzzer** is a precision fuzz-testing framework for detecting *numerical instability* in machine learning (ML) applications. It uniquely combines **pretrained ML-based assertions** with **gradient-guided input mutation**, enabling it to uncover bugs that silently corrupt outputs — such as NaNs, Infs, and **plausible-but-wrong predictions**.
 
-- ✨ Targets PyTorch and TensorFlow-based ML code
-- 🧠 Uses trained models to predict instability
-- 📉 Mutates inputs with gradient guidance — not just randomness
-- 🔬 Validates failures with 6 oracles — not just NaN checks
-- 📈 Outperforms 5 SOTA fuzzers on benchmarks and real-world bugs
+Unlike conventional fuzzers, it doesn't rely on brute-force or coverage alone. Instead, it strategically navigates the input space using soft assertions — lightweight ML models trained to signal when and how numerical errors might occur.
 
+> Designed for deep learning frameworks like **PyTorch** and **TensorFlow**, this tool is built to break brittle code with scientific precision.
 
+**Highlights:**
 
-> **Automatically Detecting Numerical Instability in Machine Learning Applications via Learned Soft Assertions**  
-> 📜 [FSE 2025 Paper](https://arxiv.org/pdf/2504.15507) · 📦 [Replication Package](https://figshare.com/s/6528d21ccd28bea94c32)
-<!-- Short description with direct paper and dataset links -->
+- ✨ **Targets unstable math operations** like `exp()`, `log()`, `softmax()`, `matmul()`, etc.
+- 🧠 **Uses pretrained ML models** to guide fuzzing toward failure-prone regions.
+- 📉 **Applies gradient-based mutation**, not just random noise.
+- 🔬 **Validates failures using six oracles**, beyond simple NaN checks.
+- 📈 **Outperforms five SOTA fuzzers** on benchmarks and real-world applications.
 
-
-![Soft Assertion Fuzzer Illustration](https://github.com/AnwarXahid/soft-assertion-fuzzer/blob/main/soft-assertion-fuzzer-tool.png)
-<!-- Insert your actual illustration URL above -->
-
-*Illustration: Soft Assertions guide ML fuzzing to expose hidden numerical instabilities.*
-<!-- Short caption explaining the image -->
+> 📄 **FSE 2025 Paper**:  
+> _Automatically Detecting Numerical Instability in Machine Learning Applications via Learned Soft Assertions_  
+> 📜 [Read on arXiv](https://arxiv.org/pdf/2504.15507) · 📦 [Replication Package](https://figshare.com/s/6528d21ccd28bea94c32)
 
 ---
 
-## 📌 Abstract
-<!-- Short, high-level summary of the project -->
+![Soft Assertion Fuzzer Illustration](https://github.com/AnwarXahid/soft-assertion-fuzzer/blob/main/soft-assertion-fuzzer-tool.png)  
+*Illustration: Soft Assertions guide ML fuzzing to expose hidden numerical instabilities.*
 
-**Soft Assertion Fuzzer** is an automated fuzz-testing tool designed specifically for Machine Learning (ML) applications. Leveraging pretrained ML models (termed *Soft Assertions*), it intelligently mutates inputs to trigger numerical instabilities such as NaNs, Infs, and silent incorrect outputs. Unlike conventional fuzzers, it captures subtle, domain-specific numerical errors and significantly outperforms existing state-of-the-art tools in finding critical numerical bugs.
+---
+## 📌 Abstract
+
+**Soft Assertion Fuzzer** is an automated testing framework tailored for detecting numerical instability in Machine Learning (ML) programs. Unlike traditional fuzzers that rely on random or syntactic mutations, this tool leverages *pretrained machine learning models*—called **Soft Assertions**—to identify instability-prone computations and guide input mutations toward failure-inducing conditions. It uncovers issues such as silent prediction errors, NaNs, and Infs in numerical code that are often missed by conventional testing tools.
 
 ---
 
 ## 🎯 Motivation
-<!-- Clearly explain the importance and need for this tool -->
 
-Numerical instabilities are critical yet often overlooked problems in ML applications. Such instabilities can lead to incorrect predictions, wasted computational resources, or severe system failures.
+Modern ML applications heavily rely on floating-point computations over large or sensitive numerical ranges. Small perturbations in input values or model weights can lead to severe instabilities, affecting both correctness and performance. However, such issues often go undetected during standard validation and deployment workflows.
 
-**Limitations of existing tools:**
+**Key challenges in existing tools:**
 
-- ❌ Rely solely on random or coverage-based fuzzing.
-- ❌ Miss nuanced numerical issues common in ML code.
-- ❌ Unable to detect subtle bugs producing incorrect outputs.
+- ❌ Limited to random input fuzzing or shallow heuristics.
+- ❌ Lack domain-specific knowledge of numerical behavior in ML.
+- ❌ Fail to detect non-crashing but semantically incorrect outputs.
 
-**Soft Assertion Fuzzer addresses these issues by:**
+**Soft Assertion Fuzzer is designed to overcome these by:**
 
-- ✅ Learning numerical instability conditions from unit test data.
-- ✅ Employing pretrained ML models for guided input mutation.
-- ✅ Uncovering subtle bugs beyond mere crashes (NaN, Inf, incorrect predictions).
+- ✅ Learning failure-inducing behavior through supervised training on unit test data.
+- ✅ Using ML-based classifiers (Soft Assertions) to guide gradient-informed mutations.
+- ✅ Integrating multiple runtime oracles for fine-grained instability detection.
 
 ---
 
 ## 🚀 Key Features
-<!-- Highlight distinct technical advantages clearly -->
 
-- **ML-based Soft Assertions**: Automatically identifies numerical instability conditions.
-- **Automatic Hook Injection**: Scans and integrates checkpoints within ML scripts.
-- **Gradient-Based Mutation**: Guided input mutations based on ML insights.
-- **Extensive Oracles**: Supports 6+ types of numerical error detections.
-- **Detailed Failure Logging**: Tracks and logs all failure-inducing scenarios clearly.
+- **Soft Assertions**: Pretrained models that predict instability regions for ML operators.
+- **AST-Based Hooking**: Automatically instruments ML scripts for fuzzing.
+- **Gradient-Guided Mutation**: Applies autodiff to refine input generation.
+- **Oracle-Based Validation**: Employs semantic oracles (NaN/Inf, incorrect class, etc.).
+- **Failure Tracing & Logging**: Captures inputs, timeouts, and full function traces.
 
 ---
 
@@ -98,27 +96,27 @@ Numerical instabilities are critical yet often overlooked problems in ML applica
 ```text
 ML Program
    ↓
-[Hook Injection] — scans for unstable functions
+[AST Scanner] → Identifies unstable numerical functions
    ↓
-[Soft Assertion Model] — predicts direction to instability
+[Soft Assertion Model] → Predicts which inputs can trigger instability
    ↓
-[Auto-Diff Engine] — mutates inputs with gradient signals
+[Auto-Differentiation] → Computes mutation directions via gradient signals
    ↓
-[Oracle Checkers] — validates failure symptoms (NaN, wrong output, etc.)
+[Oracle Evaluation] → Validates outcome (e.g., NaN, Inf, semantic misclassification)
    ↓
-[Logger] — captures root causes, inputs, and summaries
+[Structured Logging] → Reports root cause, trigger inputs, and function call metadata
 ```
 
 ---
 
 ## 🧪 Evaluation
 
-| Benchmark      | Bugs Found | Time (avg) |
-|----------------|------------|------------|
-| GRIST (79 apps) | ✅ 79/79   | ⏱️ 0.646s  |
-| Real-World (15 apps) | ✅ 12/15 | ⏱️ 1.92s  |
+| Dataset              | Programs | Bugs Found | Time/Program |
+|----------------------|----------|------------|--------------|
+| GRIST Benchmark      | 79       | ✅ 79/79    | ⏱️ 0.646 sec |
+| GitHub ML Projects   | 15       | ✅ 12/15    | ⏱️ 1.92 sec  |
 
-> ✳️ Detected bugs missed by PyFuzz, Hypothesis, GRIST, Atheris, and RANUM.
+> 🏆 Soft Assertion Fuzzer uncovered critical bugs missed by Hypothesis, PyFuzz, GRIST, Atheris, and RANUM.
 
 ---
 
