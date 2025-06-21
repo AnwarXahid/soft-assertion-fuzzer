@@ -402,5 +402,17 @@ MIT License
 
 ---
 
+## ✍️ Author
+
+**Name:**  Anwar Hossain Zahid
+
+**Email:** ahzahid@iastate.edu
+
+**Phone:** +1-515-766-1601
+
+**github:**: https://anwarxahid.github.io/
+
+---
+
 
 
