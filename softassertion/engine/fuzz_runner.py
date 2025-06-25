@@ -19,11 +19,13 @@ from change_direction import (
 spinner = itertools.cycle(["|", "/", "-", "\\"])
 colorama_init(autoreset=True)
 
+
 def run_fuzzing_on_calls(call_names):
     config = load_default_config()
     trace_entries = []
     summary = []
 
+    # Step 2: ScanForUnstableFunctions(p, D)
     if config.get("enable_parallel", False):
         import concurrent.futures
         with concurrent.futures.ThreadPoolExecutor() as executor:
@@ -53,6 +55,7 @@ def run_fuzz_for_one_call(call, config, trace_entries, summary):
     model_type = config.get("model_type", "14_by_14")
 
     try:
+        # Step 4: GenerateInitialInput()
         input_config = {k: v for k, v in config.items() if k in generator.__code__.co_varnames}
         inputs = generator(**input_config)
         if not isinstance(inputs, tuple):
@@ -61,9 +64,11 @@ def run_fuzz_for_one_call(call, config, trace_entries, summary):
         for tensor in inputs:
             tensor.requires_grad_(True)
 
+        # Step 5: H ← ∅
         osc_tracker = OscillationTracker(threshold=config.get("oscillation_threshold", 3))
         start_time = time.time()
 
+        # Step 6: while t < Timeout
         while True:
             elapsed = time.time() - start_time
             sys.stdout.write(f"\r[FuzzRunner] Fuzzing {call} {next(spinner)}")
@@ -73,6 +78,7 @@ def run_fuzz_for_one_call(call, config, trace_entries, summary):
                 print(f"{Fore.CYAN}\n[FuzzRunner] ⏱️ Timeout: {call} exceeded {time_budget} seconds{Style.RESET_ALL}")
                 break
 
+            # Step 7: v ← Execute(x, p, f, entry)
             if call in torch.nn.functional.__dict__:
                 fn = getattr(torch.nn.functional, call)
             elif hasattr(torch, call):
@@ -87,6 +93,7 @@ def run_fuzz_for_one_call(call, config, trace_entries, summary):
                 print(f"\n[FuzzRunner] Error in function execution: {e}")
                 break
 
+            # Step 8: signal ← SoftAssertion(A, v, f)
             if not oracle(output):
                 print(f"{Fore.RED}\n[FuzzRunner] ❌ Bug triggered by input:\n{inputs}{Style.RESET_ALL}")
                 os.makedirs("experiments/logs", exist_ok=True)
@@ -111,12 +118,14 @@ def run_fuzz_for_one_call(call, config, trace_entries, summary):
                 else:
                     break
 
+            # Step 15: Δx ← AutoDiff(x, f, signal)
             # === Direction-based mutation with oscillation handling ===
             if len(inputs) == 1:
                 direction = get_change_direction(inputs[0], call, model_type=model_type)
                 delta = direction * 50 / (torch.abs(inputs[0]) + 1e-6)
                 osc_tracker.update(delta)
 
+                # Step 16–17: x′ ← ConstraintSolving(x, Δx, H)
                 if osc_tracker.should_solve():
                     midpoint = osc_tracker.midpoint(inputs[0])
                     inputs = (midpoint.detach(),)

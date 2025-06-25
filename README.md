@@ -14,7 +14,7 @@
 
 - [📚 What is This?](#-what-is-this)
 - [🎯 Overview & Key Features](#-overview--key-features)
-- [🧪 Evaluation](#-evaluation)
+- [🧪 Evaluation](#-evaluation-results)
 - [🔧 Prerequisites](#-prerequisites)
 - [🛠️ Installation](#-installation)
 - [🎮 Usage Modes](#-usage-modes)
@@ -289,6 +289,81 @@ Here’s what a **real bug discovery** might look like:
   }
 ]
 ```
+
+---
+
+## 🧬 Advanced Examples
+
+Beyond minimal test cases, **Soft Assertion Fuzzer** supports more realistic workflows and flexible configurations. Below are two illustrative examples showing how to apply the tool on real-world ML code and modular scripts.
+
+---
+
+### 📈 Example 1: Real Dataset — Kaggle Preprocessing Code
+
+Let’s assume you’re loading real data (e.g., from Kaggle) and want to test numerical stability in a forward pass.
+
+```python
+# scripts/kaggle_case.py
+import torch
+import pandas as pd
+from softassertion.analysis.boundary_tracer import start_fuzz, end_fuzz
+
+df = pd.read_csv("kaggle_data.csv")
+input_tensor = torch.tensor(df.values[:, :9]).float()
+...
+...
+# Start Fuzzing
+start_fuzz()
+
+logits = torch.nn.functional.relu(input_tensor)
+...
+...
+output = torch.log(logits)
+
+# End Fuzzing
+end_fuzz()
+
+print("Log Output:", output)
+```
+
+📌 Soft Assertion Fuzzer supports **arbitrary input shapes** and **real datasets** — as long as the tensors are valid.
+
+---
+
+### 🔗 Example 2: Cross-Script Instrumentation (Multi-file Setup)
+
+Soft Assertion Fuzzer supports marking fuzzing boundaries **across files** — making it possible to test modular or pipeline code.
+
+#### `script_1.py`
+```python
+# script_1.py
+import torch
+from softassertion.analysis.boundary_tracer import start_fuzz
+
+def prepare_data():
+    start_fuzz()
+    x = torch.rand((3, 3))
+    return x
+```
+
+#### `script_2.py`
+```python
+# script_2.py
+import torch
+from script_1 import prepare_data
+from softassertion.analysis.boundary_tracer import end_fuzz
+
+def compute():
+    x = prepare_data()
+    z = torch.log(x - 0.5)
+    print("Log output:", z)
+    end_fuzz()
+
+if __name__ == "__main__":
+    compute()
+```
+
+📌 Hooks (`start_fuzz()` and `end_fuzz()`) can live in different files — as long as the execution flow passes through both. 
 
 ---
 
