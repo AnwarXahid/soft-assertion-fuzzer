@@ -1,51 +1,39 @@
 # 🔍🐞 Soft Assertion Fuzzer
 
 > - **A smarter way to find numerical bugs in ML code.**
-> - Powered by learned *soft assertions*, this fuzzer doesn’t just catch crashes — it uncovers hidden instabilities like NaNs, Infs, and silent mispredictions that break model reliability.
+> - Powered by learned *soft assertions*, this fuzzer doesn’t just catch crashes — it uncovers hidden instabilities like NaNs, INFs, and incorrect outputs that break model reliability.
 > - If your ML code is numerically unstable — **we will detect it. Automatically. Precisely. At scale.**
 
 ---
 
 ![Soft Assertion Fuzzer Banner](https://github.com/AnwarXahid/soft-assertion-fuzzer/blob/main/soft-assertion-fuzzer-banner.png)
-*“Detect what others miss. Fix what others ignore.”*
 
 ---
 
 ## 📋 Table of Contents
 
-- [📚 What is This?](#what-is-this)
-- [📌 Abstract](#abstract)
-- [🎯 Motivation](#motivation)
-- [🚀 Key Features](#key-features)
-- [🧠 How It Works](#how-it-works)
-- [🧪 Evaluation](#evaluation)
-- [🔧 Prerequisites](#prerequisites)
-- [🛠️ Installation](#installation)
-- [🎮 Usage Modes](#usage-modes)
-- [🚀 Quick Start](#quick-start)
-- [🧩 Project Structure](#project-structure)
-- [🤖 Extend the Tool](#extend-the-tool)
-- [🤝 Contributing](#contributing)
-- [📜 Citation](#citation)
-- [⚖️ License](#license)
+- [📚 What is This?](#-what-is-this)
+- [🎯 Overview & Key Features](#-overview--key-features)
+- [🧪 Evaluation](#-evaluation)
+- [🔧 Prerequisites](#-prerequisites)
+- [🛠️ Installation](#-installation)
+- [🎮 Usage Modes](#-usage-modes)
+- [🚀 Quick Start](#-quick-start)
+- [🧩 Project Structure](#-project-structure)
+- [🤖 Extend the Tool](#-extend-the-tool)
+- [🤝 Contributing](#-contributing)
+- [📜 Citation](#-citation)
+- [⚖️ License](#-license)
 
 ---
 
 ## 📚 What Is This?
 
-**Soft Assertion Fuzzer** is a precision fuzz-testing framework for detecting *numerical instability* in machine learning (ML) applications. It uniquely combines **pretrained ML-based assertions** with **gradient-guided input mutation**, enabling it to uncover bugs that silently corrupt outputs — such as NaNs, Infs, and **plausible-but-wrong predictions**.
+**Soft Assertion Fuzzer** is a precision fuzz-testing framework for detecting *numerical instability* in machine learning (ML) applications. It uniquely combines **pretrained ML-based assertions** with **gradient-guided input mutation**, enabling it to uncover bugs that silently corrupt outputs — such as NaNs, Infs, and wrong outputs.
 
 Unlike conventional fuzzers, it doesn't rely on brute-force or coverage alone. Instead, it strategically navigates the input space using soft assertions — lightweight ML models trained to signal when and how numerical errors might occur.
 
-> Designed for deep learning frameworks like **PyTorch** and **TensorFlow**, this tool is built to break brittle code with scientific precision.
-
-**Highlights:**
-
-- ✨ **Targets unstable math operations** like `exp()`, `log()`, `softmax()`, `matmul()`, etc.
-- 🧠 **Uses pretrained ML models** to guide fuzzing toward failure-prone regions.
-- 📉 **Applies gradient-based mutation**, not just random noise.
-- 🔬 **Validates failures using six oracles**, beyond simple NaN checks.
-- 📈 **Outperforms five SOTA fuzzers** on benchmarks and real-world applications.
+> Designed for deep learning frameworks like **PyTorch** and **TensorFlow**, this tool is built to detect subtle numerical instability in ML code with precision.
 
 > 📄 **FSE 2025 Paper**:  
 > _Automatically Detecting Numerical Instability in Machine Learning Applications via Learned Soft Assertions_  
@@ -54,70 +42,65 @@ Unlike conventional fuzzers, it doesn't rely on brute-force or coverage alone. I
 ---
 
 ![Soft Assertion Fuzzer Illustration](https://github.com/AnwarXahid/soft-assertion-fuzzer/blob/main/soft-assertion-fuzzer-tool.png)  
-*Illustration: Soft Assertions guide ML fuzzing to expose hidden numerical instabilities.*
-
----
-## 📌 Abstract
-
-**Soft Assertion Fuzzer** is an automated testing framework tailored for detecting numerical instability in Machine Learning (ML) programs. Unlike traditional fuzzers that rely on random or syntactic mutations, this tool leverages *pretrained machine learning models*—called **Soft Assertions**—to identify instability-prone computations and guide input mutations toward failure-inducing conditions. It uncovers issues such as silent prediction errors, NaNs, and Infs in numerical code that are often missed by conventional testing tools.
+> **Illustration:** *Soft Assertions guide ML fuzzing to expose hidden numerical instabilities.*
 
 ---
 
-## 🎯 Motivation
+## 🎯 Overview & Key Features
 
-Modern ML applications heavily rely on floating-point computations over large or sensitive numerical ranges. Small perturbations in input values or model weights can lead to severe instabilities, affecting both correctness and performance. However, such issues often go undetected during standard validation and deployment workflows.
+**Soft Assertion Fuzzer** is an automated testing framework tailored for detecting numerical instability in Machine Learning (ML) programs. Modern ML applications heavily rely on floating-point computations over large or sensitive numerical ranges, where small perturbations in input values or model weights can lead to severe instabilities, affecting both correctness and performance. However, such issues often go undetected during standard validation and deployment workflows.
 
-**Key challenges in existing tools:**
+### The Problem with Existing Tools
 
-- ❌ Limited to random input fuzzing or shallow heuristics.
-- ❌ Lack domain-specific knowledge of numerical behavior in ML.
-- ❌ Fail to detect non-crashing but semantically incorrect outputs.
+Traditional testing approaches fall short when dealing with ML numerical instability:
 
-**Soft Assertion Fuzzer is designed to overcome these by:**
+- ❌ **Limited scope**: Random input fuzzing or shallow heuristics miss complex failure patterns
+- ❌ **No domain knowledge**: Lack understanding of numerical behavior specific to ML operations  
+- ❌ **Silent failures**: Fail to detect non-crashing but semantically incorrect outputs
+- ❌ **Inefficient exploration**: Cannot strategically navigate high-dimensional input spaces
 
-- ✅ Learning failure-inducing behavior through supervised training on unit test data.
-- ✅ Using ML-based classifiers (Soft Assertions) to guide gradient-informed mutations.
-- ✅ Integrating multiple runtime oracles for fine-grained instability detection.
+### Our Solution: ML-Guided Fuzzing
 
----
+Unlike traditional fuzzers that rely on random or syntactic mutations, this tool leverages *pretrained machine learning models*—called **Soft Assertions**—to identify instability-prone computations and guide input mutations toward failure-inducing conditions. It uncovers issues such as silent prediction errors, NaNs, and Infs in numerical code that are often missed by conventional testing tools.
 
-## 🚀 Key Features
+### 🚀 Key Features
 
-- **Soft Assertions**: Pretrained models that predict instability regions for ML operators.
-- **AST-Based Hooking**: Automatically instruments ML scripts for fuzzing.
-- **Gradient-Guided Mutation**: Applies autodiff to refine input generation.
-- **Oracle-Based Validation**: Employs semantic oracles (NaN/Inf, incorrect class, etc.).
-- **Failure Tracing & Logging**: Captures inputs, timeouts, and full function traces.
+- **✨ Soft Assertions**: Pretrained ML models that predict instability regions for common ML operators like `exp()`, `log()`, `cosine_similarity()`, `matmul()`, etc.
 
----
+- **🧠 Intelligent Targeting**: Uses supervised learning on unit test data to understand failure-inducing behavior patterns.
 
-## 🧠 How It Works
+- **📉 Gradient-Guided Mutation**: Applies autodifferentiation to compute optimal mutation directions, not just random noise.
 
-```text
-ML Program
-   ↓
-[AST Scanner] → Identifies unstable numerical functions
-   ↓
-[Soft Assertion Model] → Predicts which inputs can trigger instability
-   ↓
-[Auto-Differentiation] → Computes mutation directions via gradient signals
-   ↓
-[Oracle Evaluation] → Validates outcome (e.g., NaN, Inf, semantic misclassification)
-   ↓
-[Structured Logging] → Reports root cause, trigger inputs, and function call metadata
-```
+- **🔬 Multi-Oracle Validation**: Employs six different runtime oracles for fine-grained instability detection beyond simple NaN/INF checks.
+
+- **⚙️ AST-Based Hooking**: Automatically instruments ML scripts for fuzzing without manual code modification.
+
+- **📈 Superior Performance**: Outperforms five state-of-the-art fuzzers (Hypothesis, PyFuzz, GRIST, Atheris, RANUM) on benchmarks and real-world applications.
+
+- **🔍 Comprehensive Logging**: Captures failure-triggering inputs, timeouts, and full function execution traces for root cause analysis.
+
+**Why This Matters**: This framework bridges the gap between traditional software testing and the unique challenges of ML numerical computing, enabling developers to catch subtle bugs that could compromise model reliability in production.
 
 ---
 
-## 🧪 Evaluation
+## 📊 Evaluation Results
 
-| Dataset              | Programs | Bugs Found | Time/Program |
-|----------------------|----------|------------|--------------|
-| GRIST Benchmark      | 79       | ✅ 79/79    | ⏱️ 0.646 sec |
-| GitHub ML Projects   | 15       | ✅ 12/15    | ⏱️ 1.92 sec  |
+### Performance Comparison with State-of-the-Art
 
-> 🏆 Soft Assertion Fuzzer uncovered critical bugs missed by Hypothesis, PyFuzz, GRIST, Atheris, and RANUM.
+| Fuzzer | GRIST (79) | GRIST Avg Time (sec) | Real-World (15) | NaN/INF | Other Failures |
+|--------|------------|---------------------|-----------------|---------|----------------|
+| **SA Fuzzer** | **79** | **0.646** | **13** | **88** | **4** |
+| RANUM [28] | 79 | 2.209 | 3 | 82 | 0 |
+| GRIST [47] | 78 | 44.267 | 3 | 81 | 0 |
+| Atheris [31] | 25 | 0.283 | 3 | 27 | 1 |
+| PyFuzz [1] | 24 | 5.498 | 3 | 26 | 1 |
+| Hypothesis [41] | 23 | 5.945 | 3 | 25 | 1 |
 
+**Key Findings:**
+- **Superior Detection**: SA Fuzzer achieves the highest detection rates across all categories
+- **Fastest Execution**: 0.646 seconds average time, 4x faster than the next best performer
+- **Real-World Effectiveness**: Finds 13/15 real-world bugs vs. 3/15 for other tools
+- **Comprehensive Coverage**: Detects both NaN/INF failures (88) and other numerical instabilities (4)
 ---
 
 ## 🔧 Prerequisites
@@ -136,7 +119,7 @@ ML Program
 git clone https://github.com/your-username/soft-assertion-fuzzer.git
 cd soft-assertion-fuzzer
 python3.10 -m venv venv
-source venv/bin/activate  # Windows: venv\Scripts\activate
+source venv/bin/activate 
 pip install -r requirements.txt
 pip install -e .
 ```
@@ -325,9 +308,6 @@ Below is a high-level overview of the **Soft Assertion Fuzzer** directory layout
 │   ├── cli.py                      # Command-line entry point
 │   └── main.py                     # Tool bootstrapper
 │
-├── oracles/                        # Function-specific numerical checkers
-├── generators/                     # Input generators (random, targeted)
-├── scripts/                        # Ready-to-fuzz ML scripts (15 real-world cases)
 ├── experiments/                    # Logs and reports from fuzzing runs
 │   ├── bugs/                       # Confirmed bug-triggering cases
 │   ├── logs/                       # Fuzzer execution traces
@@ -338,13 +318,12 @@ Below is a high-level overview of the **Soft Assertion Fuzzer** directory layout
 │   ├── dataset/                    # Evaluation results (XLSX)
 │   └── images/                     # Visual diagrams used in docs
 │
+├── oracles/                        # Function-specific numerical checkers
+├── generators/                     # Input generators (random, targeted)
+├── scripts/                        # Ready-to-fuzz ML scripts (15 real-world cases)
 ├── docs/                           # Project documentation
-│   ├── design.md                   # Architecture and internals
-│   ├── extend.md                   # How to add new functions
-│   └── usage.md                    # Walkthrough and screenshots
-│
 ├── tests/                          # Unit tests for major components
-├── run_models.py                   # Utility to train or test assertion models
+├── run_models.py                   # Utility to run assertion models
 ├── requirements.txt                # Python dependencies
 ├── setup.py                        # Installation metadata
 ├── LICENSE                         # MIT License
